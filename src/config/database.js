@@ -1,7 +1,7 @@
 export default {
 	user: 'postgres',
-	password: '123qwe!@#',
+	password: 'postgres',
 	host: 'localhost',
 	port: 5432,
-	database: 'dragonboxdb'
+	database: 'dragonbox_db'
 }
