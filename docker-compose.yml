@@ -5,10 +5,11 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: 123qwe!@#
-      POSTGRES_DB: dragonbox_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: POSTGRES_DB
     volumes:
-      - ./database:/var/lib/postgresql/data
+      - ./docker/postgresql:/var/lib/postgresql/data
     ports:
       - 5432:5432
     networks:
@@ -17,8 +18,8 @@ services:
   pdadmin_compose:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: careycoder@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: 123qwe!@#
+      PGADMIN_DEFAULT_EMAIL: PGADMIN_DEFAULT_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: PGADMIN_DEFAULT_PASSWORD
     depends_on:
       - db
     ports:
@@ -28,14 +29,21 @@ services:
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-beta.6
-    ports:
-      - 8080:8080
     depends_on:
       - db
     restart: always
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/postgres
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+    command: ["postgraphile", "--connection", $HASURA_GRAPHQL_DATABASE_URL, "--host", "0.0.0.0", "--port", "5000", "--schema", "$POSTGRES_DB"]
+    links:
+      - db
+    networks:
+      - postgres_compose_network
 
 networks:
   postgres_compose_network:
